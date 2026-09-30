@@ -1,0 +1,24 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Testing and profiling
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Large uncompressed datasets (keep baseline patient_vitals.csv & .gitkeep)
+data/raw/human_vital_signs_dataset_2024.csv
+data/raw/test_non_existent.csv
+
+# Operating System files
+.DS_Store
+Thumbs.db
+ehthumbs.db

@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Real-Time Patient Anomaly Detector | ICU Telemetry</title>
+  
+  <!-- Modern Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    :root {
+      --bg-base: #070b14;
+      --bg-card: rgba(15, 23, 42, 0.75);
+      --bg-card-hover: rgba(30, 41, 59, 0.85);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-focus: rgba(56, 189, 248, 0.4);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      
+      --cyan-core: #06b6d4;
+      --cyan-glow: rgba(6, 182, 212, 0.25);
+      --success: #10b981;
+      --success-glow: rgba(16, 185, 129, 0.2);
+      --warning: #f59e0b;
+      --warning-glow: rgba(245, 158, 11, 0.3);
+      --danger: #ef4444;
+      --danger-glow: rgba(239, 68, 68, 0.45);
+      
+      --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-base);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(6, 182, 212, 0.08) 0px, transparent 45%),
+        radial-gradient(at 100% 100%, rgba(239, 68, 68, 0.06) 0px, transparent 50%),
+        radial-gradient(at 50% 50%, rgba(15, 23, 42, 0.5) 0px, transparent 100%);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 16px 24px;
+    }
+
+    /* Container */
+    .dashboard-container {
+      max-width: 1360px;
+      width: 100%;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    /* Glass Panels */
+    .glass-panel {
+      background: var(--bg-card);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Top Bar */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 20px;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .pulse-ring {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+      animation: pulse-animation 2s infinite cubic-bezier(0.66, 0, 0, 1);
+    }
+
+    @keyframes pulse-animation {
+      to { box-shadow: 0 0 0 12px rgba(16, 185, 129, 0); }
+    }
+
+    .brand-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-subtitle {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+    .controls-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    /* Patient Selector */
+    .selector-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 4px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .selector-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .patient-select {
+      background: transparent;
+      border: none;
+      color: var(--cyan-core);
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 700;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .patient-select option {
+      background: #0f172a;
+      color: #f8fafc;
+    }
+
+    /* Connection Badge */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 20px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .badge-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--warning);
+    }
+
+    .status-connected .badge-dot { background: var(--success); }
+    .status-disconnected .badge-dot { background: var(--danger); }
+
+    /* System Status */
+    .system-status {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Action Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.2s ease;
+    }
+
+    .btn-audio {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: var(--border-subtle);
+      color: var(--text-main);
+    }
+
+    .btn-audio.active {
+      background: rgba(6, 182, 212, 0.15);
+      border-color: var(--cyan-core);
+      color: var(--cyan-core);
+    }
+
+    .btn-ack {
+      background: rgba(239, 68, 68, 0.15);
+      border-color: rgba(239, 68, 68, 0.4);
+      color: #fca5a5;
+    }
+
+    .btn-ack.active-alarm {
+      background: var(--danger);
+      color: #fff;
+      animation: pulse-ack 1s infinite alternate ease-in-out;
+      box-shadow: 0 0 15px var(--danger-glow);
+    }
+
+    @keyframes pulse-ack {
+      from { transform: scale(1); }
+      to { transform: scale(1.04); }
+    }
+
+    /* Risk Banner */
+    .risk-banner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 20px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .risk-score-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .risk-title {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .risk-bar-container {
+      width: 180px;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .risk-bar-fill {
+      height: 100%;
+      width: 15%;
+      background: var(--success);
+      border-radius: 4px;
+      transition: width 0.4s ease, background-color 0.4s ease;
+    }
+
+    .risk-numeric {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 1.05rem;
+    }
+
+    .severity-pill {
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      padding: 6px 16px;
+      border-radius: 8px;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      background: rgba(16, 185, 129, 0.12);
+      color: var(--success);
+    }
+
+    .severity-pill.warning {
+      border-color: rgba(245, 158, 11, 0.4);
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--warning);
+    }
+
+    .severity-pill.critical {
+      border-color: rgba(239, 68, 68, 0.6);
+      background: rgba(239, 68, 68, 0.25);
+      color: var(--danger);
+      animation: alert-flash 1s infinite alternate;
+    }
+
+    @keyframes alert-flash {
+      from { box-shadow: 0 0 5px var(--danger-glow); }
+      to { box-shadow: 0 0 20px var(--danger-glow); }
+    }
+
+    /* Vitals Grid */
+    .vitals-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    @media (max-width: 900px) {
+      .vitals-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 520px) {
+      .vitals-grid { grid-template-columns: 1fr; }
+    }
+
+    .vital-card {
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 140px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .vital-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: transparent;
+      transition: background-color 0.3s;
+    }
+
+    /* Dynamic states */
+    .vital-card.normal::before { background: var(--cyan-core); }
+    
+    .vital-card.warning {
+      border-color: var(--warning);
+      background: rgba(245, 158, 11, 0.08);
+      box-shadow: 0 0 15px var(--warning-glow);
+    }
+    .vital-card.warning::before { background: var(--warning); }
+
+    .vital-card.critical {
+      border-color: var(--danger);
+      background: rgba(239, 68, 68, 0.12);
+      box-shadow: 0 0 25px var(--danger-glow);
+      animation: card-pulsing 1.2s infinite alternate ease-in-out;
+    }
+    .vital-card.critical::before { background: var(--danger); }
+
+    @keyframes card-pulsing {
+      0% { border-color: rgba(239, 68, 68, 0.4); }
+      100% { border-color: rgba(239, 68, 68, 1); box-shadow: 0 0 30px var(--danger-glow); }
+    }
+
+    .vital-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .vital-name {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .vital-icon {
+      font-size: 1.2rem;
+    }
+
+    .vital-body {
+      margin: 10px 0;
+    }
+
+    .vital-value {
+      font-family: var(--font-mono);
+      font-size: 2.2rem;
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: -0.03em;
+    }
+
+    .vital-unit {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-left: 4px;
+      font-family: var(--font-sans);
+      font-weight: 500;
+    }
+
+    .vital-footer {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* Main Content Layout (Chart + Alert Log) */
+    .content-split {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 16px;
+    }
+
+    @media (max-width: 950px) {
+      .content-split { grid-template-columns: 1fr; }
+    }
+
+    /* Chart Section */
+    .chart-panel {
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .chart-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+
+    .chart-legend {
+      display: flex;
+      gap: 16px;
+      font-size: 0.75rem;
+      font-family: var(--font-mono);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .dot-hr { width: 10px; height: 10px; border-radius: 2px; background: var(--cyan-core); }
+    .dot-spo2 { width: 10px; height: 10px; border-radius: 2px; background: var(--success); }
+
+    .chart-wrapper {
+      position: relative;
+      height: 280px;
+      width: 100%;
+    }
+
+    /* Alerts Log Section */
+    .alerts-panel {
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      height: 350px;
+    }
+
+    .alerts-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .alerts-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .alerts-count {
+      background: rgba(239, 68, 68, 0.2);
+      color: var(--danger);
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-family: var(--font-mono);
+      font-weight: 700;
+    }
+
+    .btn-clear {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      cursor: pointer;
+    }
+    .btn-clear:hover { color: var(--text-main); }
+
+    .alerts-scroll {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-right: 4px;
+    }
+
+    .alerts-scroll::-webkit-scrollbar {
+      width: 4px;
+    }
+    .alerts-scroll::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+    }
+
+    .alert-entry {
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-family: var(--font-mono);
+      line-height: 1.4;
+      background: rgba(255, 255, 255, 0.02);
+      border-left: 3px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      animation: entry-fade 0.3s ease;
+    }
+
+    @keyframes entry-fade {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .alert-entry.critical {
+      border-left-color: var(--danger);
+      background: rgba(239, 68, 68, 0.08);
+      color: #fca5a5;
+    }
+
+    .alert-entry.warning {
+      border-left-color: var(--warning);
+      background: rgba(245, 158, 11, 0.08);
+      color: #fde68a;
+    }
+
+    .alert-entry.info {
+      border-left-color: var(--cyan-core);
+      color: #94a3b8;
+    }
+
+    .entry-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.7rem;
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard-container">
+    
+    <!-- 1. Top Bar -->
+    <header class="top-bar glass-panel">
+      <div class="brand-section">
+        <div class="pulse-ring" id="liveRing"></div>
+        <div>
+          <h1 class="brand-title">ICU Real-Time Telemetry & Anomaly Detector</h1>
+          <p class="brand-subtitle">FastAPI WebSocket Stream • IsolationForest ML + Rule Guardrails</p>
+        </div>
+      </div>
+
+      <div class="controls-section">
+        <!-- Patient Selector -->
+        <div class="selector-wrapper">
+          <span class="selector-label">Patient:</span>
+          <select id="patientSelector" class="patient-select">
+            <option value="PATIENT_001" selected>PATIENT_001</option>
+            <option value="PATIENT_002">PATIENT_002</option>
+            <option value="PATIENT_003">PATIENT_003</option>
+            <option value="PATIENT-1001">PATIENT-1001</option>
+          </select>
+        </div>
+
+        <!-- Connection Status -->
+        <div class="badge status-disconnected" id="connectionBadge">
+          <span class="badge-dot"></span>
+          <span id="connectionText">Disconnected</span>
+        </div>
+
+        <!-- Audio Alert Toggle -->
+        <button id="audioToggle" class="btn btn-audio" title="Toggle audio alert on CRITICAL events">
+          🔊 Audio Alert: <span id="audioState">OFF</span>
+        </button>
+
+        <!-- Emergency Acknowledgment -->
+        <button id="ackBtn" class="btn btn-ack" title="Acknowledge active critical alert">
+          ⚠️ Acknowledge Alarm
+        </button>
+
+        <!-- System Status -->
+        <div class="system-status">
+          <span>Engine:</span>
+          <strong style="color: var(--cyan-core);">Online (1 Hz)</strong>
+        </div>
+      </div>
+    </header>
+
+    <!-- Risk Overview Banner -->
+    <section class="risk-banner glass-panel">
+      <div class="risk-score-group">
+        <span class="risk-title">Anomaly Risk Score:</span>
+        <div class="risk-bar-container">
+          <div class="risk-bar-fill" id="riskFill"></div>
+        </div>
+        <span class="risk-numeric" id="riskScore">0.00</span>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="font-size: 0.8rem; color: var(--text-muted);">Current Severity:</span>
+        <div class="severity-pill" id="severityPill">NORMAL</div>
+      </div>
+    </section>
+
+    <!-- 2. Vitals Grid (HR, SpO2, BP, Temp) -->
+    <section class="vitals-grid">
+      <!-- Heart Rate -->
+      <div class="vital-card glass-panel normal" id="cardHR">
+        <div class="vital-header">
+          <span class="vital-name">Heart Rate</span>
+          <span class="vital-icon">❤️</span>
+        </div>
+        <div class="vital-body">
+          <span class="vital-value" id="valHR">--</span>
+          <span class="vital-unit">bpm</span>
+        </div>
+        <div class="vital-footer">
+          <span>Safe: 45 - 130 bpm</span>
+          <span id="statHR">NORMAL</span>
+        </div>
+      </div>
+
+      <!-- SpO2 -->
+      <div class="vital-card glass-panel normal" id="cardSpO2">
+        <div class="vital-header">
+          <span class="vital-name">Oxygen (SpO2)</span>
+          <span class="vital-icon">🫁</span>
+        </div>
+        <div class="vital-body">
+          <span class="vital-value" id="valSpO2">--</span>
+          <span class="vital-unit">%</span>
+        </div>
+        <div class="vital-footer">
+          <span>Safe: &ge; 90%</span>
+          <span id="statSpO2">NORMAL</span>
+        </div>
+      </div>
+
+      <!-- Blood Pressure -->
+      <div class="vital-card glass-panel normal" id="cardBP">
+        <div class="vital-header">
+          <span class="vital-name">Blood Pressure</span>
+          <span class="vital-icon">🩺</span>
+        </div>
+        <div class="vital-body">
+          <span class="vital-value" id="valBP">-- / --</span>
+          <span class="vital-unit">mmHg</span>
+        </div>
+        <div class="vital-footer">
+          <span>Safe SBP: 85 - 170</span>
+          <span id="statBP">MAP: --</span>
+        </div>
+      </div>
+
+      <!-- Temperature -->
+      <div class="vital-card glass-panel normal" id="cardTemp">
+        <div class="vital-header">
+          <span class="vital-name">Temperature</span>
+          <span class="vital-icon">🌡️</span>
+        </div>
+        <div class="vital-body">
+          <span class="vital-value" id="valTemp">--</span>
+          <span class="vital-unit">°C</span>
+        </div>
+        <div class="vital-footer">
+          <span>Safe: &le; 39.0°C</span>
+          <span id="statTemp">NORMAL</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Dynamic Chart & 4. Alerts Log -->
+    <div class="content-split">
+      <!-- Time Series Chart (Heart Rate & SpO2) -->
+      <section class="chart-panel glass-panel">
+        <div class="chart-header">
+          <h2 class="chart-title">Real-Time Telemetry Trends (Last 30 Points)</h2>
+          <div class="chart-legend">
+            <div class="legend-item"><span class="dot-hr"></span> Heart Rate (bpm)</div>
+            <div class="legend-item"><span class="dot-spo2"></span> SpO2 (%)</div>
+          </div>
+        </div>
+        <div class="chart-wrapper">
+          <canvas id="vitalsChart"></canvas>
+        </div>
+      </section>
+
+      <!-- Alerts Log Sidebar -->
+      <aside class="alerts-panel glass-panel">
+        <div class="alerts-header">
+          <h2 class="alerts-title">
+            <span>🚨 Clinical Event Log</span>
+            <span class="alerts-count" id="alertsCount">0</span>
+          </h2>
+          <button class="btn-clear" id="clearLogBtn">Clear Log</button>
+        </div>
+        <div class="alerts-scroll" id="alertsScroll">
+          <div class="alert-entry info">
+            <div class="entry-meta">
+              <span>SYSTEM</span>
+              <span>INIT</span>
+            </div>
+            <span>Awaiting telemetry WebSocket feed...</span>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+  </div>
+
+  <script>
+    // --- Application State ---
+    let socket = null;
+    let audioEnabled = false;
+    let isAlarmSilenced = false;
+    let audioContext = null;
+    let alertCounter = 0;
+
+    const MAX_POINTS = 30;
+    const chartLabels = [];
+    const hrData = [];
+    const spo2Data = [];
+
+    // --- DOM Selectors ---
+    const patientSelector = document.getElementById("patientSelector");
+    const connectionBadge = document.getElementById("connectionBadge");
+    const connectionText = document.getElementById("connectionText");
+    const audioToggle = document.getElementById("audioToggle");
+    const audioState = document.getElementById("audioState");
+    const ackBtn = document.getElementById("ackBtn");
+
+    const riskFill = document.getElementById("riskFill");
+    const riskScore = document.getElementById("riskScore");
+    const severityPill = document.getElementById("severityPill");
+
+    const cardHR = document.getElementById("cardHR");
+    const valHR = document.getElementById("valHR");
+    const statHR = document.getElementById("statHR");
+
+    const cardSpO2 = document.getElementById("cardSpO2");
+    const valSpO2 = document.getElementById("valSpO2");
+    const statSpO2 = document.getElementById("statSpO2");
+
+    const cardBP = document.getElementById("cardBP");
+    const valBP = document.getElementById("valBP");
+    const statBP = document.getElementById("statBP");
+
+    const cardTemp = document.getElementById("cardTemp");
+    const valTemp = document.getElementById("valTemp");
+    const statTemp = document.getElementById("statTemp");
+
+    const alertsScroll = document.getElementById("alertsScroll");
+    const alertsCount = document.getElementById("alertsCount");
+    const clearLogBtn = document.getElementById("clearLogBtn");
+
+    // --- Chart.js Initialization ---
+    const ctx = document.getElementById("vitalsChart").getContext("2d");
+    const vitalsChart = new Chart(ctx, {
+      type: "line",
+      data: {
+        labels: chartLabels,
+        datasets: [
+          {
+            label: "Heart Rate (bpm)",
+            data: hrData,
+            borderColor: "#06b6d4",
+            backgroundColor: "rgba(6, 182, 212, 0.08)",
+            borderWidth: 2,
+            tension: 0.35,
+            fill: true,
+            yAxisID: "yHR",
+            pointRadius: 2,
+            pointHoverRadius: 5,
+          },
+          {
+            label: "SpO2 (%)",
+            data: spo2Data,
+            borderColor: "#10b981",
+            backgroundColor: "transparent",
+            borderWidth: 2.2,
+            tension: 0.3,
+            borderDash: [4, 4],
+            yAxisID: "ySpO2",
+            pointRadius: 2,
+            pointHoverRadius: 5,
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: { duration: 250 },
+        interaction: { mode: "index", intersect: false },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: "rgba(15, 23, 42, 0.9)",
+            borderColor: "rgba(255, 255, 255, 0.1)",
+            borderWidth: 1,
+            titleFont: { family: "'JetBrains Mono', monospace", size: 11 },
+            bodyFont: { family: "'JetBrains Mono', monospace", size: 12 },
+          }
+        },
+        scales: {
+          x: {
+            grid: { color: "rgba(255, 255, 255, 0.04)" },
+            ticks: {
+              color: "#94a3b8",
+              font: { family: "'JetBrains Mono', monospace", size: 10 },
+              maxRotation: 0,
+            }
+          },
+          yHR: {
+            type: "linear",
+            position: "left",
+            min: 40,
+            max: 180,
+            grid: { color: "rgba(255, 255, 255, 0.05)" },
+            ticks: {
+              color: "#06b6d4",
+              font: { family: "'JetBrains Mono', monospace", size: 11 },
+              callback: (v) => `${v} bpm`
+            }
+          },
+          ySpO2: {
+            type: "linear",
+            position: "right",
+            min: 70,
+            max: 100,
+            grid: { drawOnChartArea: false },
+            ticks: {
+              color: "#10b981",
+              font: { family: "'JetBrains Mono', monospace", size: 11 },
+              callback: (v) => `${v}%`
+            }
+          }
+        }
+      }
+    });
+
+    // --- Web Audio Telemetry Beep (CRITICAL alerts) ---
+    function playMedicalBeep() {
+      if (!audioEnabled || isAlarmSilenced) return;
+      try {
+        if (!audioContext) {
+          audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioContext.state === "suspended") {
+          audioContext.resume();
+        }
+
+        const now = audioContext.currentTime;
+        // Two-tone urgent clinical beep (880Hz -> 1174Hz)
+        [880, 1174].forEach((freq, idx) => {
+          const osc = audioContext.createOscillator();
+          const gain = audioContext.createGain();
+
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(freq, now + idx * 0.14);
+
+          gain.gain.setValueAtTime(0.12, now + idx * 0.14);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.14 + 0.11);
+
+          osc.connect(gain);
+          gain.connect(audioContext.destination);
+
+          osc.start(now + idx * 0.14);
+          osc.stop(now + idx * 0.14 + 0.12);
+        });
+      } catch (err) {
+        console.warn("Audio alert failed:", err);
+      }
+    }
+
+    // --- Audio Toggle & Acknowledge Handlers ---
+    audioToggle.addEventListener("click", () => {
+      audioEnabled = !audioEnabled;
+      audioToggle.classList.toggle("active", audioEnabled);
+      audioState.textContent = audioEnabled ? "ON" : "OFF";
+      if (audioEnabled) {
+        if (!audioContext) {
+          audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        audioContext.resume();
+        addAlertLog("Audio alerts enabled for CRITICAL events.", "info");
+      } else {
+        addAlertLog("Audio alerts muted.", "info");
+      }
+    });
+
+    ackBtn.addEventListener("click", () => {
+      isAlarmSilenced = true;
+      ackBtn.classList.remove("active-alarm");
+      addAlertLog("Emergency alarm acknowledged by clinician.", "info");
+    });
+
+    clearLogBtn.addEventListener("click", () => {
+      alertsScroll.innerHTML = "";
+      alertCounter = 0;
+      alertsCount.textContent = "0";
+    });
+
+    // --- WebSocket Manager ---
+    function connectWebSocket() {
+      const patientId = patientSelector.value || "PATIENT_001";
+      const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+      const host = window.location.host || "localhost:8000";
+      const wsUrl = `${protocol}//${host}/ws/live/${patientId}?interval=1.0`;
+
+      if (socket) {
+        socket.close();
+      }
+
+      setConnectionStatus("connecting", `Connecting to ${patientId}...`);
+
+      socket = new WebSocket(wsUrl);
+
+      socket.onopen = () => {
+        setConnectionStatus("connected", `Live: ${patientId}`);
+        addAlertLog(`WebSocket connected to telemetry feed for ${patientId}`, "info");
+      };
+
+      socket.onmessage = (event) => {
+        try {
+          const payload = JSON.parse(event.data);
+          handleTelemetry(payload);
+        } catch (err) {
+          console.error("Failed to parse telemetry:", err);
+        }
+      };
+
+      socket.onclose = () => {
+        setConnectionStatus("disconnected", "Disconnected. Reconnecting...");
+        setTimeout(connectWebSocket, 2500);
+      };
+
+      socket.onerror = (err) => {
+        console.warn("WebSocket error:", err);
+      };
+    }
+
+    function setConnectionStatus(status, text) {
+      connectionBadge.className = "badge";
+      if (status === "connected") {
+        connectionBadge.classList.add("status-connected");
+      } else if (status === "connecting") {
+        connectionBadge.classList.add("status-connecting");
+      } else {
+        connectionBadge.classList.add("status-disconnected");
+      }
+      connectionText.textContent = text;
+    }
+
+    patientSelector.addEventListener("change", () => {
+      addAlertLog(`Switching patient stream to ${patientSelector.value}...`, "info");
+      // Reset chart history for new patient
+      chartLabels.length = 0;
+      hrData.length = 0;
+      spo2Data.length = 0;
+      vitalsChart.update();
+      connectWebSocket();
+    });
+
+    // --- Telemetry Processor ---
+    function handleTelemetry(payload) {
+      const vitals = payload.raw_vitals || {};
+      const severity = payload.severity || "NORMAL";
+      const isAnomaly = payload.is_anomaly || false;
+      const risk = payload.anomaly_score !== undefined ? payload.anomaly_score : 0.0;
+      const reasons = payload.flagged_reasons || [];
+      const timestamp = payload.timestamp || (Date.now() / 1000);
+
+      const timeStr = new Date(timestamp * 1000).toLocaleTimeString();
+
+      // 1. Update Risk Overview Banner
+      riskScore.textContent = risk.toFixed(2);
+      riskFill.style.width = `${Math.min(100, Math.round(risk * 100))}%`;
+
+      severityPill.textContent = severity;
+      severityPill.className = "severity-pill";
+      if (severity === "CRITICAL") {
+        severityPill.classList.add("critical");
+        riskFill.style.backgroundColor = "#ef4444";
+        ackBtn.classList.add("active-alarm");
+        playMedicalBeep();
+      } else if (severity === "WARNING") {
+        severityPill.classList.add("warning");
+        riskFill.style.backgroundColor = "#f59e0b";
+      } else {
+        riskFill.style.backgroundColor = "#10b981";
+        isAlarmSilenced = false; // Reset acknowledgment when healthy
+        ackBtn.classList.remove("active-alarm");
+      }
+
+      // 2. Update Vitals Grid
+      const hr = vitals.heart_rate;
+      const spo2 = vitals.spo2;
+      const sbp = vitals.systolic_bp;
+      const dbp = vitals.diastolic_bp;
+      const temp = vitals.temperature;
+
+      // Heart Rate
+      valHR.textContent = hr !== undefined ? Math.round(hr) : "--";
+      updateCardState(cardHR, statHR, hr < 45 || hr > 130, hr < 55 || hr > 115, "bpm");
+
+      // SpO2
+      valSpO2.textContent = spo2 !== undefined ? spo2.toFixed(1) : "--";
+      updateCardState(cardSpO2, statSpO2, spo2 < 90.0, spo2 < 94.0, "%");
+
+      // Blood Pressure
+      if (sbp !== undefined && dbp !== undefined) {
+        valBP.textContent = `${Math.round(sbp)} / ${Math.round(dbp)}`;
+        const pp = sbp - dbp;
+        const map = dbp + (pp / 3.0);
+        statBP.textContent = `MAP: ${Math.round(map)} mmHg`;
+        updateCardState(cardBP, null, sbp < 85 || sbp > 170, sbp < 95 || sbp > 150);
+      }
+
+      // Temperature
+      valTemp.textContent = temp !== undefined ? temp.toFixed(1) : "--";
+      updateCardState(cardTemp, statTemp, temp > 39.0 || temp < 35.0, temp > 38.0 || temp < 36.0, "°C");
+
+      // 3. Update Chart.js Series
+      if (hr !== undefined && spo2 !== undefined) {
+        chartLabels.push(timeStr);
+        hrData.push(hr);
+        spo2Data.push(spo2);
+
+        if (chartLabels.length > MAX_POINTS) {
+          chartLabels.shift();
+          hrData.shift();
+          spo2Data.shift();
+        }
+        vitalsChart.update("none");
+      }
+
+      // 4. Update Alerts Log
+      if (isAnomaly || severity !== "NORMAL") {
+        const details = reasons.length > 0 ? reasons.join(" • ") : `Elevated risk index (${risk.toFixed(2)})`;
+        addAlertLog(`[${timeStr}] ${severity}: ${details}`, severity.toLowerCase());
+      }
+    }
+
+    function updateCardState(cardEl, statEl, isCritical, isWarning) {
+      cardEl.classList.remove("normal", "warning", "critical");
+      if (isCritical) {
+        cardEl.classList.add("critical");
+        if (statEl) statEl.textContent = "CRITICAL";
+      } else if (isWarning) {
+        cardEl.classList.add("warning");
+        if (statEl) statEl.textContent = "WARNING";
+      } else {
+        cardEl.classList.add("normal");
+        if (statEl && statEl.id !== "statBP") statEl.textContent = "NORMAL";
+      }
+    }
+
+    function addAlertLog(message, type) {
+      alertCounter++;
+      alertsCount.textContent = alertCounter;
+
+      const entry = document.createElement("div");
+      entry.className = `alert-entry ${type}`;
+
+      const meta = document.createElement("div");
+      meta.className = "entry-meta";
+      meta.innerHTML = `<span>${type.toUpperCase()}</span><span>${new Date().toLocaleTimeString()}</span>`;
+
+      const text = document.createElement("span");
+      text.textContent = message;
+
+      entry.appendChild(meta);
+      entry.appendChild(text);
+
+      alertsScroll.insertBefore(entry, alertsScroll.firstChild);
+
+      // Keep max 60 log entries in memory
+      while (alertsScroll.children.length > 60) {
+        alertsScroll.removeChild(alertsScroll.lastChild);
+      }
+    }
+
+    // Auto-connect on page load
+    window.addEventListener("DOMContentLoaded", () => {
+      connectWebSocket();
+    });
+  </script>
+</body>
+</html>
