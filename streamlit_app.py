@@ -22,36 +22,49 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# Custom Medical CSS Theme
+# Custom Medical CSS Theme (Wine Red Palette)
 st.markdown(
     """
     <style>
-    .main { background-color: #070b14; color: #f8fafc; }
+    .main { 
+        background: radial-gradient(ellipse at 10% 10%, rgba(225, 29, 72, 0.14) 0px, transparent 50%),
+                    radial-gradient(ellipse at 90% 90%, rgba(136, 19, 55, 0.18) 0px, transparent 55%),
+                    #0b0204; 
+        color: #fff1f2; 
+    }
     .stMetric {
-        background: rgba(15, 23, 42, 0.7);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 12px;
-        padding: 14px 18px;
-        box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+        background: rgba(28, 6, 15, 0.75);
+        border: 1px solid rgba(244, 63, 94, 0.22);
+        border-radius: 14px;
+        padding: 16px 20px;
+        box-shadow: 0 10px 30px -5px rgba(0,0,0,0.65), 0 0 16px rgba(136, 19, 55, 0.15);
+        transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .stMetric:hover {
+        transform: translateY(-6px) scale(1.02);
+        border-color: rgba(251, 113, 133, 0.65);
+        box-shadow: 0 20px 40px -8px rgba(0,0,0,0.8), 0 0 25px rgba(225, 29, 72, 0.4);
     }
     .metric-card-critical {
-        background: rgba(239, 68, 68, 0.15) !important;
-        border: 1px solid #ef4444 !important;
+        background: rgba(255, 23, 68, 0.16) !important;
+        border: 1px solid #ff1744 !important;
+        box-shadow: 0 0 25px rgba(255, 23, 68, 0.5) !important;
     }
     .metric-card-warning {
-        background: rgba(245, 158, 11, 0.15) !important;
+        background: rgba(245, 158, 11, 0.16) !important;
         border: 1px solid #f59e0b !important;
+        box-shadow: 0 0 20px rgba(245, 158, 11, 0.35) !important;
     }
     .status-pill {
         display: inline-block;
-        padding: 4px 14px;
+        padding: 6px 16px;
         border-radius: 20px;
         font-weight: 700;
         font-size: 0.85rem;
     }
-    .status-normal { background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid #10b981; }
+    .status-normal { background: rgba(225, 29, 72, 0.15); color: #fda4af; border: 1px solid rgba(244, 63, 94, 0.4); }
     .status-warning { background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid #f59e0b; }
-    .status-critical { background: rgba(239, 68, 68, 0.25); color: #ef4444; border: 1px solid #ef4444; }
+    .status-critical { background: rgba(255, 23, 68, 0.28); color: #fff; border: 1px solid #ff1744; }
     </style>
     """,
     unsafe_allow_html=True,
