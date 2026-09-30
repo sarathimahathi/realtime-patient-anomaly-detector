@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Real-Time Patient Anomaly Detector | Wine Red & Frosted White Telemetry</title>
+  <title>Real-Time Patient Anomaly Detector | Clinical ICU Telemetry</title>
   
   <!-- Modern Typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -15,7 +15,7 @@
 
   <style>
     :root {
-      /* Blended Wine Red & Frosted White Luxury Palette */
+      /* Base Blended Frosted White & Wine Red Theme */
       --bg-base: #fcf6f8;
       --bg-card: linear-gradient(135deg, rgba(255, 255, 255, 0.90) 0%, rgba(255, 248, 250, 0.84) 45%, rgba(255, 235, 240, 0.78) 100%);
       --bg-card-hover: linear-gradient(135deg, rgba(255, 255, 255, 0.97) 0%, rgba(255, 245, 248, 0.92) 50%, rgba(254, 226, 232, 0.88) 100%);
@@ -24,26 +24,48 @@
       --border-white: rgba(255, 255, 255, 0.95);
       --border-focus: rgba(225, 29, 72, 0.55);
       
-      --text-main: #4c0519;       /* Deep rich Cabernet for high readability */
-      --text-secondary: #700c27;  /* Velvet Merlot */
-      --text-muted: #9f1239;      /* Wine Rose */
+      --text-main: #4c0519;
+      --text-secondary: #700c27;
+      --text-muted: #9f1239;
       --text-dim: #b91c1c;
       
-      --wine-primary: #be123c;    /* Deep Cabernet Crimson */
-      --wine-vibrant: #e11d48;    /* Luminous Rose Wine */
-      --wine-light: #fda4af;      /* Soft Rose Frost */
-      --wine-deep: #881337;       /* Velvet Bordeaux */
-      --white-pure: #ffffff;
+      --wine-primary: #be123c;
+      --wine-vibrant: #e11d48;
+      --wine-light: #fda4af;
+      --wine-deep: #881337;
       
-      --wine-glow: rgba(225, 29, 72, 0.28);
-      --white-glow: rgba(255, 255, 255, 0.95);
-      
+      /* Specific Clinical Vitals Theming */
+      /* 1. Heart Theme: Cardiac Crimson Wine */
+      --heart-theme-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 241, 244, 0.88) 45%, rgba(254, 205, 211, 0.40) 100%);
+      --heart-theme-border: rgba(225, 29, 72, 0.28);
+      --heart-theme-accent: #e11d48;
+      --heart-theme-deep: #881337;
+      --heart-theme-glow: rgba(225, 29, 72, 0.35);
+
+      /* 2. Oxygen Theme: Pulmonary Azure Cyan */
+      --oxygen-theme-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 249, 255, 0.90) 45%, rgba(186, 230, 253, 0.40) 100%);
+      --oxygen-theme-border: rgba(2, 132, 199, 0.28);
+      --oxygen-theme-accent: #0284c7;
+      --oxygen-theme-deep: #0369a1;
+      --oxygen-theme-glow: rgba(14, 165, 233, 0.35);
+
+      /* 3. Blood Pressure Theme: Arterial Crimson Blood */
+      --blood-theme-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(254, 242, 242, 0.90) 45%, rgba(254, 202, 202, 0.40) 100%);
+      --blood-theme-border: rgba(185, 28, 28, 0.28);
+      --blood-theme-accent: #b91c1c;
+      --blood-theme-deep: #7f1d1d;
+      --blood-theme-glow: rgba(220, 38, 38, 0.35);
+
+      /* 4. Temperature Theme: Thermal Amber Gold */
+      --temp-theme-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 251, 235, 0.90) 45%, rgba(254, 240, 138, 0.40) 100%);
+      --temp-theme-border: rgba(217, 119, 6, 0.28);
+      --temp-theme-accent: #d97706;
+      --temp-theme-deep: #78350f;
+      --temp-theme-glow: rgba(245, 158, 11, 0.35);
+
       --success: #059669;
-      --success-bg: rgba(16, 185, 129, 0.12);
       --warning: #d97706;
-      --warning-bg: rgba(245, 158, 11, 0.14);
       --danger: #e11d48;
-      --danger-bg: rgba(225, 29, 72, 0.14);
       
       --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
       --font-mono: 'JetBrains Mono', monospace;
@@ -73,7 +95,7 @@
       overflow-x: hidden;
     }
 
-    /* Ambient Floating Animations for Each Block */
+    /* Ambient Floating Animations */
     @keyframes floatSlow1 {
       0%, 100% {
         transform: translateY(0px) rotate(0deg);
@@ -120,7 +142,7 @@
       gap: 20px;
     }
 
-    /* Glass Panels: Blended White & Wine Red */
+    /* Glass Panels */
     .glass-panel {
       background: var(--bg-card);
       backdrop-filter: blur(20px);
@@ -141,9 +163,8 @@
       position: relative;
     }
 
-    /* Hovering State on Any Block: Lifts, glows with white & wine aura */
-    .glass-panel:hover,
-    .vital-card:hover {
+    /* Default Panel Hover */
+    .glass-panel:hover {
       animation-play-state: paused !important;
       transform: translateY(-11px) scale(1.018) !important;
       background: var(--bg-card-hover) !important;
@@ -224,7 +245,7 @@
     }
     .selector-wrapper:hover {
       border-color: var(--border-focus);
-      box-shadow: 0 0 18px var(--wine-glow), 0 2px 8px rgba(0,0,0,0.06);
+      box-shadow: 0 0 18px rgba(225, 29, 72, 0.3), 0 2px 8px rgba(0,0,0,0.06);
       transform: translateY(-2px);
     }
 
@@ -392,7 +413,7 @@
       background: linear-gradient(90deg, #fda4af 0%, #f43f5e 50%, #881337 100%);
       border-radius: 8px;
       transition: width 0.4s ease, background-color 0.4s ease;
-      box-shadow: 0 0 10px var(--wine-glow);
+      box-shadow: 0 0 10px rgba(225, 29, 72, 0.3);
     }
 
     .risk-numeric {
@@ -417,7 +438,7 @@
 
     .severity-pill.warning {
       border-color: rgba(217, 119, 6, 0.45);
-      background: var(--warning-bg);
+      background: rgba(245, 158, 11, 0.14);
       color: var(--warning);
       box-shadow: 0 0 15px rgba(217, 119, 6, 0.25);
     }
@@ -448,30 +469,23 @@
       .vitals-grid { grid-template-columns: 1fr; }
     }
 
-    /* Vital Card Blocks */
+    /* Base Vital Card */
     .vital-card {
       padding: 22px 24px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      min-height: 154px;
+      min-height: 158px;
       position: relative;
       overflow: hidden;
       border-radius: 18px;
-    }
-
-    /* Staggered Ambient Floating for Each Vital Card */
-    .vital-card:nth-child(1) {
-      animation: floatSlow1 5.4s ease-in-out infinite 0.1s;
-    }
-    .vital-card:nth-child(2) {
-      animation: floatSlow3 6.0s ease-in-out infinite 0.7s;
-    }
-    .vital-card:nth-child(3) {
-      animation: floatSlow2 5.6s ease-in-out infinite 1.3s;
-    }
-    .vital-card:nth-child(4) {
-      animation: floatSlow4 6.2s ease-in-out infinite 1.9s;
+      border: 1px solid var(--border-white);
+      box-shadow: 0 14px 36px -6px rgba(0, 0, 0, 0.07), inset 0 1px 2px #fff;
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+                  box-shadow 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+                  border-color 0.35s ease,
+                  background 0.35s ease;
+      will-change: transform, box-shadow;
     }
 
     .vital-card::before {
@@ -481,39 +495,195 @@
       left: 0;
       width: 5px;
       height: 100%;
-      background: var(--wine-vibrant);
       transition: background-color 0.3s;
     }
 
-    /* Dynamic states */
-    .vital-card.normal::before { background: var(--wine-vibrant); }
-    
+    /* Staggered Ambient Floating for Each Vital Card */
+    .vital-card:nth-child(1) { animation: floatSlow1 5.4s ease-in-out infinite 0.1s; }
+    .vital-card:nth-child(2) { animation: floatSlow3 6.0s ease-in-out infinite 0.7s; }
+    .vital-card:nth-child(3) { animation: floatSlow2 5.6s ease-in-out infinite 1.3s; }
+    .vital-card:nth-child(4) { animation: floatSlow4 6.2s ease-in-out infinite 1.9s; }
+
+    /* Category Badges on Vitals */
+    .vital-tag {
+      font-size: 0.65rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      padding: 3px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      font-family: var(--font-mono);
+      margin-left: 6px;
+      display: inline-block;
+    }
+
+    /* ------------------------------------------------------------- */
+    /* VITAL BLOCK 1: HEART RATE (Cardiac Wine / Ruby Theme)        */
+    /* ------------------------------------------------------------- */
+    .card-heart {
+      background: var(--heart-theme-bg);
+      border-color: var(--heart-theme-border);
+    }
+    .card-heart::before {
+      background: linear-gradient(180deg, #f43f5e 0%, #be123c 100%);
+    }
+    .card-heart .vital-name { color: #881337; }
+    .card-heart .vital-tag {
+      background: rgba(225, 29, 72, 0.12);
+      color: #be123c;
+      border: 1px solid rgba(225, 29, 72, 0.25);
+    }
+    .card-heart .vital-icon {
+      background: linear-gradient(135deg, #ffffff 0%, #ffe4e6 100%);
+      border: 1px solid rgba(225, 29, 72, 0.25);
+      color: #e11d48;
+      box-shadow: 0 3px 10px rgba(225, 29, 72, 0.12);
+    }
+    .card-heart .vital-value {
+      color: #881337;
+      text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
+    }
+    .card-heart .vital-unit { color: #be123c; }
+    .card-heart .vital-footer { color: #9f1239; }
+    .card-heart:hover {
+      animation-play-state: paused !important;
+      transform: translateY(-11px) scale(1.02) !important;
+      background: linear-gradient(135deg, #ffffff 0%, #fff1f3 50%, #fecdd3 100%) !important;
+      border-color: var(--heart-theme-accent) !important;
+      box-shadow: 0 26px 52px -10px rgba(190, 18, 60, 0.22), 0 0 30px rgba(255, 255, 255, 0.95), 0 0 25px var(--heart-theme-glow) !important;
+      z-index: 10;
+    }
+
+    /* ------------------------------------------------------------- */
+    /* VITAL BLOCK 2: OXYGEN (Pulmonary Azure / Cyan Theme)         */
+    /* ------------------------------------------------------------- */
+    .card-oxygen {
+      background: var(--oxygen-theme-bg);
+      border-color: var(--oxygen-theme-border);
+    }
+    .card-oxygen::before {
+      background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);
+    }
+    .card-oxygen .vital-name { color: #0369a1; }
+    .card-oxygen .vital-tag {
+      background: rgba(2, 132, 199, 0.12);
+      color: #0284c7;
+      border: 1px solid rgba(2, 132, 199, 0.25);
+    }
+    .card-oxygen .vital-icon {
+      background: linear-gradient(135deg, #ffffff 0%, #e0f2fe 100%);
+      border: 1px solid rgba(2, 132, 199, 0.25);
+      color: #0284c7;
+      box-shadow: 0 3px 10px rgba(2, 132, 199, 0.12);
+    }
+    .card-oxygen .vital-value {
+      color: #0369a1;
+      text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
+    }
+    .card-oxygen .vital-unit { color: #0284c7; }
+    .card-oxygen .vital-footer { color: #0369a1; }
+    .card-oxygen:hover {
+      animation-play-state: paused !important;
+      transform: translateY(-11px) scale(1.02) !important;
+      background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 50%, #bae6fd 100%) !important;
+      border-color: var(--oxygen-theme-accent) !important;
+      box-shadow: 0 26px 52px -10px rgba(2, 132, 199, 0.22), 0 0 30px rgba(255, 255, 255, 0.95), 0 0 25px var(--oxygen-theme-glow) !important;
+      z-index: 10;
+    }
+
+    /* ------------------------------------------------------------- */
+    /* VITAL BLOCK 3: BLOOD PRESSURE (Arterial Blood Red Theme)     */
+    /* ------------------------------------------------------------- */
+    .card-blood {
+      background: var(--blood-theme-bg);
+      border-color: var(--blood-theme-border);
+    }
+    .card-blood::before {
+      background: linear-gradient(180deg, #ef4444 0%, #991b1b 100%);
+    }
+    .card-blood .vital-name { color: #991b1b; }
+    .card-blood .vital-tag {
+      background: rgba(185, 28, 28, 0.12);
+      color: #b91c1c;
+      border: 1px solid rgba(185, 28, 28, 0.25);
+    }
+    .card-blood .vital-icon {
+      background: linear-gradient(135deg, #ffffff 0%, #fee2e2 100%);
+      border: 1px solid rgba(185, 28, 28, 0.25);
+      color: #b91c1c;
+      box-shadow: 0 3px 10px rgba(185, 28, 28, 0.12);
+    }
+    .card-blood .vital-value {
+      color: #7f1d1d;
+      text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
+    }
+    .card-blood .vital-unit { color: #991b1b; }
+    .card-blood .vital-footer { color: #991b1b; }
+    .card-blood:hover {
+      animation-play-state: paused !important;
+      transform: translateY(-11px) scale(1.02) !important;
+      background: linear-gradient(135deg, #ffffff 0%, #fef2f2 50%, #fecaca 100%) !important;
+      border-color: var(--blood-theme-accent) !important;
+      box-shadow: 0 26px 52px -10px rgba(185, 28, 28, 0.22), 0 0 30px rgba(255, 255, 255, 0.95), 0 0 25px var(--blood-theme-glow) !important;
+      z-index: 10;
+    }
+
+    /* ------------------------------------------------------------- */
+    /* VITAL BLOCK 4: TEMPERATURE (Thermal Amber / Gold Theme)      */
+    /* ------------------------------------------------------------- */
+    .card-temp {
+      background: var(--temp-theme-bg);
+      border-color: var(--temp-theme-border);
+    }
+    .card-temp::before {
+      background: linear-gradient(180deg, #f59e0b 0%, #b45309 100%);
+    }
+    .card-temp .vital-name { color: #b45309; }
+    .card-temp .vital-tag {
+      background: rgba(217, 119, 6, 0.12);
+      color: #b45309;
+      border: 1px solid rgba(217, 119, 6, 0.25);
+    }
+    .card-temp .vital-icon {
+      background: linear-gradient(135deg, #ffffff 0%, #fef3c7 100%);
+      border: 1px solid rgba(217, 119, 6, 0.25);
+      color: #d97706;
+      box-shadow: 0 3px 10px rgba(217, 119, 6, 0.12);
+    }
+    .card-temp .vital-value {
+      color: #78350f;
+      text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
+    }
+    .card-temp .vital-unit { color: #b45309; }
+    .card-temp .vital-footer { color: #92400e; }
+    .card-temp:hover {
+      animation-play-state: paused !important;
+      transform: translateY(-11px) scale(1.02) !important;
+      background: linear-gradient(135deg, #ffffff 0%, #fffbeb 50%, #fef08a 100%) !important;
+      border-color: var(--temp-theme-accent) !important;
+      box-shadow: 0 26px 52px -10px rgba(217, 119, 6, 0.22), 0 0 30px rgba(255, 255, 255, 0.95), 0 0 25px var(--temp-theme-glow) !important;
+      z-index: 10;
+    }
+
+    /* Warning & Critical Alert Overrides on Any Vital Card */
     .vital-card.warning {
-      border-color: rgba(217, 119, 6, 0.4);
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.94) 0%, rgba(254, 243, 199, 0.7) 100%);
-      box-shadow: 0 0 20px rgba(217, 119, 6, 0.15);
+      border-color: rgba(217, 119, 6, 0.5) !important;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(254, 243, 199, 0.75) 100%) !important;
+      box-shadow: 0 0 22px rgba(217, 119, 6, 0.25) !important;
     }
-    .vital-card.warning::before { background: var(--warning); }
-    .vital-card.warning:hover {
-      border-color: var(--warning) !important;
-      box-shadow: 0 26px 52px -10px rgba(217, 119, 6, 0.25) !important;
-    }
+    .vital-card.warning::before { background: var(--warning) !important; }
 
     .vital-card.critical {
-      border-color: rgba(225, 29, 72, 0.6);
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 228, 230, 0.8) 100%);
-      box-shadow: 0 0 28px rgba(225, 29, 72, 0.22);
-      animation: card-pulsing 1.2s infinite alternate ease-in-out;
+      border-color: rgba(255, 23, 68, 0.65) !important;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 228, 230, 0.85) 100%) !important;
+      box-shadow: 0 0 28px rgba(255, 23, 68, 0.35) !important;
+      animation: card-pulsing 1.2s infinite alternate ease-in-out !important;
     }
-    .vital-card.critical::before { background: var(--wine-vibrant); }
-    .vital-card.critical:hover {
-      border-color: #ff1744 !important;
-      box-shadow: 0 26px 52px -10px rgba(225, 29, 72, 0.4) !important;
-    }
+    .vital-card.critical::before { background: #ff1744 !important; }
 
     @keyframes card-pulsing {
-      0% { border-color: rgba(225, 29, 72, 0.4); }
-      100% { border-color: rgba(225, 29, 72, 1); box-shadow: 0 0 35px rgba(225, 29, 72, 0.35); }
+      0% { border-color: rgba(255, 23, 68, 0.4); }
+      100% { border-color: #ff1744; box-shadow: 0 0 35px rgba(255, 23, 68, 0.5); }
     }
 
     .vital-header {
@@ -525,21 +695,19 @@
     .vital-name {
       font-size: 0.82rem;
       font-weight: 800;
-      color: var(--text-muted);
       text-transform: uppercase;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.05em;
+      display: flex;
+      align-items: center;
     }
 
     .vital-icon {
       font-size: 1.3rem;
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(254, 226, 232, 0.85));
-      border: 1px solid rgba(225, 29, 72, 0.15);
-      padding: 6px 8px;
+      padding: 6px 9px;
       border-radius: 10px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 3px 10px rgba(136, 19, 55, 0.06);
     }
 
     .vital-body {
@@ -552,13 +720,10 @@
       font-weight: 800;
       line-height: 1;
       letter-spacing: -0.03em;
-      color: var(--text-main);
-      text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
     }
 
     .vital-unit {
       font-size: 0.88rem;
-      color: var(--text-muted);
       margin-left: 6px;
       font-family: var(--font-sans);
       font-weight: 700;
@@ -566,7 +731,6 @@
 
     .vital-footer {
       font-size: 0.76rem;
-      color: var(--text-secondary);
       display: flex;
       justify-content: space-between;
       font-family: var(--font-mono);
@@ -620,8 +784,9 @@
       color: var(--text-secondary);
     }
 
-    .dot-hr { width: 10px; height: 10px; border-radius: 2px; background: var(--wine-vibrant); box-shadow: 0 0 6px var(--wine-glow); }
-    .dot-spo2 { width: 10px; height: 10px; border-radius: 2px; background: var(--wine-deep); box-shadow: 0 0 6px rgba(136, 19, 55, 0.3); }
+    /* Harmonized Legend Dots */
+    .dot-hr { width: 10px; height: 10px; border-radius: 2px; background: #e11d48; box-shadow: 0 0 6px rgba(225, 29, 72, 0.4); }
+    .dot-spo2 { width: 10px; height: 10px; border-radius: 2px; background: #0284c7; box-shadow: 0 0 6px rgba(2, 132, 199, 0.4); }
 
     .chart-wrapper {
       position: relative;
@@ -755,7 +920,7 @@
         <div class="pulse-ring" id="liveRing"></div>
         <div>
           <h1 class="brand-title">ICU Real-Time Telemetry & Anomaly Detector</h1>
-          <p class="brand-subtitle">Wine Red & Frosted White Blended Stream • IsolationForest ML + Guardrails</p>
+          <p class="brand-subtitle">Clinical Multi-Vital Monitor • IsolationForest ML + Medical Guardrails</p>
         </div>
       </div>
 
@@ -811,12 +976,12 @@
       </div>
     </section>
 
-    <!-- 3. Vitals Grid Blocks (HR, SpO2, BP, Temp) -->
+    <!-- 3. Distinct Themed Vitals Grid Blocks -->
     <section class="vitals-grid">
-      <!-- Heart Rate -->
-      <div class="vital-card glass-panel normal" id="cardHR">
+      <!-- 1. Heart Block: Cardiac Wine / Ruby -->
+      <div class="vital-card card-heart normal" id="cardHR">
         <div class="vital-header">
-          <span class="vital-name">Heart Rate</span>
+          <span class="vital-name">Heart Rate <span class="vital-tag">Cardiac</span></span>
           <span class="vital-icon">❤️</span>
         </div>
         <div class="vital-body">
@@ -829,10 +994,10 @@
         </div>
       </div>
 
-      <!-- SpO2 -->
-      <div class="vital-card glass-panel normal" id="cardSpO2">
+      <!-- 2. Oxygen Block: Pulmonary Azure / Cyan -->
+      <div class="vital-card card-oxygen normal" id="cardSpO2">
         <div class="vital-header">
-          <span class="vital-name">Oxygen (SpO2)</span>
+          <span class="vital-name">Oxygen (SpO2) <span class="vital-tag">Pulmonary</span></span>
           <span class="vital-icon">🫁</span>
         </div>
         <div class="vital-body">
@@ -845,10 +1010,10 @@
         </div>
       </div>
 
-      <!-- Blood Pressure -->
-      <div class="vital-card glass-panel normal" id="cardBP">
+      <!-- 3. Blood Pressure Block: Arterial Blood Red -->
+      <div class="vital-card card-blood normal" id="cardBP">
         <div class="vital-header">
-          <span class="vital-name">Blood Pressure</span>
+          <span class="vital-name">Blood Pressure <span class="vital-tag">Arterial</span></span>
           <span class="vital-icon">🩺</span>
         </div>
         <div class="vital-body">
@@ -861,10 +1026,10 @@
         </div>
       </div>
 
-      <!-- Temperature -->
-      <div class="vital-card glass-panel normal" id="cardTemp">
+      <!-- 4. Temperature Block: Thermal Amber Gold -->
+      <div class="vital-card card-temp normal" id="cardTemp">
         <div class="vital-header">
-          <span class="vital-name">Temperature</span>
+          <span class="vital-name">Temperature <span class="vital-tag">Thermal</span></span>
           <span class="vital-icon">🌡️</span>
         </div>
         <div class="vital-body">
@@ -880,13 +1045,13 @@
 
     <!-- 4. Dynamic Chart & Alerts Log Blocks -->
     <div class="content-split">
-      <!-- Time Series Chart (Heart Rate & SpO2) -->
+      <!-- Time Series Chart (Heart Rate & Oxygen SpO2) -->
       <section class="chart-panel glass-panel">
         <div class="chart-header">
           <h2 class="chart-title">Real-Time Telemetry Trends (Last 30 Points)</h2>
           <div class="chart-legend">
-            <div class="legend-item"><span class="dot-hr"></span> Heart Rate (bpm)</div>
-            <div class="legend-item"><span class="dot-spo2"></span> SpO2 (%)</div>
+            <div class="legend-item"><span class="dot-hr"></span> Heart Rate (Cardiac bpm)</div>
+            <div class="legend-item"><span class="dot-spo2"></span> Oxygen (Pulmonary SpO2 %)</div>
           </div>
         </div>
         <div class="chart-wrapper">
@@ -963,6 +1128,7 @@
     const clearLogBtn = document.getElementById("clearLogBtn");
 
     // --- Chart.js Initialization ---
+    // Heart Rate in Cardiac Crimson (#e11d48), Oxygen SpO2 in Pulmonary Azure (#0284c7)
     const ctx = document.getElementById("vitalsChart").getContext("2d");
     const vitalsChart = new Chart(ctx, {
       type: "line",
@@ -983,16 +1149,16 @@
             pointHoverRadius: 6,
           },
           {
-            label: "SpO2 (%)",
+            label: "Oxygen SpO2 (%)",
             data: spo2Data,
-            borderColor: "#881337",
+            borderColor: "#0284c7",
             backgroundColor: "transparent",
-            borderWidth: 2.2,
+            borderWidth: 2.4,
             tension: 0.3,
             borderDash: [4, 4],
             yAxisID: "ySpO2",
             pointRadius: 2.8,
-            pointBackgroundColor: "#881337",
+            pointBackgroundColor: "#0284c7",
             pointHoverRadius: 6,
           }
         ]
@@ -1043,7 +1209,7 @@
             max: 100,
             grid: { drawOnChartArea: false },
             ticks: {
-              color: "#881337",
+              color: "#0284c7",
               font: { family: "'JetBrains Mono', monospace", size: 11, weight: '700' },
               callback: (v) => `${v}%`
             }
@@ -1217,7 +1383,7 @@
       valHR.textContent = hr !== undefined ? Math.round(hr) : "--";
       updateCardState(cardHR, statHR, hr < 45 || hr > 130, hr < 55 || hr > 115, "bpm");
 
-      // SpO2
+      // SpO2 (Oxygen)
       valSpO2.textContent = spo2 !== undefined ? spo2.toFixed(1) : "--";
       updateCardState(cardSpO2, statSpO2, spo2 < 90.0, spo2 < 94.0, "%");
 
