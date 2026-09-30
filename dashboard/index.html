@@ -3,41 +3,47 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Real-Time Patient Anomaly Detector | Wine Red Telemetry</title>
+  <title>Real-Time Patient Anomaly Detector | Wine Red & Frosted White Telemetry</title>
   
   <!-- Modern Typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet" />
 
   <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
     :root {
-      /* Deep Wine Red, Cabernet & Merlot Palette */
-      --bg-base: #0b0204;
-      --bg-card: rgba(28, 6, 15, 0.75);
-      --bg-card-hover: rgba(48, 10, 26, 0.90);
-      --border-subtle: rgba(244, 63, 94, 0.20);
-      --border-focus: rgba(251, 113, 133, 0.65);
-      --text-main: #fff1f2;
-      --text-muted: #fda4af;
-      --text-dim: #9f7582;
+      /* Blended Wine Red & Frosted White Luxury Palette */
+      --bg-base: #fcf6f8;
+      --bg-card: linear-gradient(135deg, rgba(255, 255, 255, 0.90) 0%, rgba(255, 248, 250, 0.84) 45%, rgba(255, 235, 240, 0.78) 100%);
+      --bg-card-hover: linear-gradient(135deg, rgba(255, 255, 255, 0.97) 0%, rgba(255, 245, 248, 0.92) 50%, rgba(254, 226, 232, 0.88) 100%);
       
-      --wine-core: #e11d48;
-      --wine-light: #fda4af;
-      --wine-vibrant: #f43f5e;
-      --wine-deep: #881337;
-      --wine-glow: rgba(225, 29, 72, 0.35);
-      --wine-glow-strong: rgba(244, 63, 94, 0.60);
+      --border-subtle: rgba(225, 29, 72, 0.18);
+      --border-white: rgba(255, 255, 255, 0.95);
+      --border-focus: rgba(225, 29, 72, 0.55);
       
-      --success: #10b981;
-      --success-glow: rgba(16, 185, 129, 0.25);
-      --warning: #f59e0b;
-      --warning-glow: rgba(245, 158, 11, 0.35);
-      --danger: #ff1744;
-      --danger-glow: rgba(255, 23, 68, 0.55);
+      --text-main: #4c0519;       /* Deep rich Cabernet for high readability */
+      --text-secondary: #700c27;  /* Velvet Merlot */
+      --text-muted: #9f1239;      /* Wine Rose */
+      --text-dim: #b91c1c;
+      
+      --wine-primary: #be123c;    /* Deep Cabernet Crimson */
+      --wine-vibrant: #e11d48;    /* Luminous Rose Wine */
+      --wine-light: #fda4af;      /* Soft Rose Frost */
+      --wine-deep: #881337;       /* Velvet Bordeaux */
+      --white-pure: #ffffff;
+      
+      --wine-glow: rgba(225, 29, 72, 0.28);
+      --white-glow: rgba(255, 255, 255, 0.95);
+      
+      --success: #059669;
+      --success-bg: rgba(16, 185, 129, 0.12);
+      --warning: #d97706;
+      --warning-bg: rgba(245, 158, 11, 0.14);
+      --danger: #e11d48;
+      --danger-bg: rgba(225, 29, 72, 0.14);
       
       --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
       --font-mono: 'JetBrains Mono', monospace;
@@ -52,21 +58,22 @@
     body {
       background-color: var(--bg-base);
       background-image: 
-        radial-gradient(ellipse at 10% 10%, rgba(225, 29, 72, 0.18) 0px, transparent 50%),
-        radial-gradient(ellipse at 90% 90%, rgba(136, 19, 55, 0.22) 0px, transparent 55%),
-        radial-gradient(ellipse at 50% 40%, rgba(76, 5, 25, 0.22) 0px, transparent 65%),
-        radial-gradient(circle at 50% 100%, rgba(15, 2, 7, 0.95) 0px, transparent 100%);
+        radial-gradient(circle at 12% 12%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 241, 243, 0.8) 35%, transparent 65%),
+        radial-gradient(ellipse at 88% 12%, rgba(225, 29, 72, 0.16) 0%, rgba(254, 205, 211, 0.35) 40%, transparent 65%),
+        radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.85) 0%, rgba(255, 228, 235, 0.45) 40%, transparent 70%),
+        radial-gradient(circle at 18% 85%, rgba(136, 19, 55, 0.14) 0%, transparent 55%),
+        radial-gradient(ellipse at 85% 88%, rgba(255, 255, 255, 0.95) 0%, rgba(244, 63, 94, 0.15) 45%, transparent 65%);
       background-attachment: fixed;
       color: var(--text-main);
       font-family: var(--font-sans);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      padding: 18px 24px;
+      padding: 20px 26px;
       overflow-x: hidden;
     }
 
-    /* Ambient Floating Animations for Blocks */
+    /* Ambient Floating Animations for Each Block */
     @keyframes floatSlow1 {
       0%, 100% {
         transform: translateY(0px) rotate(0deg);
@@ -113,14 +120,19 @@
       gap: 20px;
     }
 
-    /* Glass Panels with Floating & Hovering */
+    /* Glass Panels: Blended White & Wine Red */
     .glass-panel {
       background: var(--bg-card);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      border: 1px solid var(--border-subtle);
-      border-radius: 16px;
-      box-shadow: 0 12px 35px -6px rgba(0, 0, 0, 0.70), 0 0 18px rgba(136, 19, 55, 0.18);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border-white);
+      border-bottom: 1px solid rgba(225, 29, 72, 0.22);
+      border-right: 1px solid rgba(225, 29, 72, 0.16);
+      border-radius: 18px;
+      box-shadow: 
+        0 14px 38px -6px rgba(136, 19, 55, 0.09), 
+        0 4px 18px rgba(255, 255, 255, 0.85),
+        inset 0 1px 2px rgba(255, 255, 255, 1);
       transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
                   box-shadow 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
                   border-color 0.35s ease,
@@ -129,16 +141,18 @@
       position: relative;
     }
 
-    /* Hover State for every block: Lifts up, glows with wine red, elevates */
+    /* Hovering State on Any Block: Lifts, glows with white & wine aura */
     .glass-panel:hover,
     .vital-card:hover {
       animation-play-state: paused !important;
-      transform: translateY(-10px) scale(1.018) !important;
+      transform: translateY(-11px) scale(1.018) !important;
       background: var(--bg-card-hover) !important;
       border-color: var(--border-focus) !important;
-      box-shadow: 0 25px 52px -8px rgba(0, 0, 0, 0.88),
-                  0 0 35px var(--wine-glow),
-                  inset 0 1px 1px rgba(255, 241, 242, 0.22) !important;
+      box-shadow: 
+        0 26px 52px -10px rgba(136, 19, 55, 0.19),
+        0 0 35px rgba(255, 255, 255, 0.95),
+        0 0 25px rgba(225, 29, 72, 0.28),
+        inset 0 1px 3px rgba(255, 255, 255, 1) !important;
       z-index: 10;
     }
 
@@ -147,7 +161,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 16px 24px;
+      padding: 18px 26px;
       flex-wrap: wrap;
       gap: 16px;
       animation: floatSlow2 7.5s ease-in-out infinite;
@@ -164,28 +178,28 @@
       height: 14px;
       border-radius: 50%;
       background: var(--wine-vibrant);
-      box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.8);
+      box-shadow: 0 0 0 0 rgba(225, 29, 72, 0.7);
       animation: wine-pulse 2s infinite cubic-bezier(0.66, 0, 0, 1);
     }
 
     @keyframes wine-pulse {
-      to { box-shadow: 0 0 0 14px rgba(244, 63, 94, 0); }
+      to { box-shadow: 0 0 0 14px rgba(225, 29, 72, 0); }
     }
 
     .brand-title {
-      font-size: 1.22rem;
+      font-size: 1.25rem;
       font-weight: 800;
       letter-spacing: -0.02em;
-      background: linear-gradient(135deg, #ffffff 0%, #ffe4e6 50%, #fda4af 100%);
+      background: linear-gradient(135deg, #4c0519 0%, #881337 50%, #be123c 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
 
     .brand-subtitle {
-      font-size: 0.75rem;
+      font-size: 0.76rem;
       color: var(--text-muted);
-      opacity: 0.85;
       font-family: var(--font-mono);
+      font-weight: 600;
       margin-top: 2px;
     }
 
@@ -201,63 +215,66 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      background: rgba(45, 10, 23, 0.55);
-      padding: 6px 12px;
-      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.85);
+      padding: 7px 14px;
+      border-radius: 12px;
       border: 1px solid var(--border-subtle);
+      box-shadow: 0 2px 8px rgba(136, 19, 55, 0.05), inset 0 1px 1px #fff;
       transition: all 0.3s ease;
     }
     .selector-wrapper:hover {
       border-color: var(--border-focus);
-      box-shadow: 0 0 16px var(--wine-glow);
+      box-shadow: 0 0 18px var(--wine-glow), 0 2px 8px rgba(0,0,0,0.06);
       transform: translateY(-2px);
     }
 
     .selector-label {
       font-size: 0.75rem;
       color: var(--text-muted);
-      font-weight: 700;
+      font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.06em;
     }
 
     .patient-select {
       background: transparent;
       border: none;
-      color: var(--wine-light);
+      color: var(--wine-deep);
       font-family: var(--font-mono);
       font-size: 0.85rem;
-      font-weight: 700;
+      font-weight: 800;
       outline: none;
       cursor: pointer;
     }
 
     .patient-select option {
-      background: #19050e;
-      color: #fff1f2;
+      background: #ffffff;
+      color: #4c0519;
     }
 
     /* Connection Badge */
     .badge {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 7px;
       font-size: 0.75rem;
-      font-weight: 700;
-      padding: 6px 14px;
+      font-weight: 800;
+      padding: 7px 15px;
       border-radius: 20px;
       border: 1px solid var(--border-subtle);
-      background: rgba(35, 8, 18, 0.5);
+      background: rgba(255, 255, 255, 0.85);
+      color: var(--text-main);
+      box-shadow: 0 2px 8px rgba(136, 19, 55, 0.05), inset 0 1px 1px #fff;
       transition: all 0.3s ease;
     }
     .badge:hover {
       transform: translateY(-2px);
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 5px 15px rgba(136, 19, 55, 0.1);
     }
 
     .badge-dot {
-      width: 8px;
-      height: 8px;
+      width: 9px;
+      height: 9px;
       border-radius: 50%;
       background: var(--warning);
     }
@@ -270,6 +287,7 @@
       font-size: 0.75rem;
       color: var(--text-muted);
       font-family: var(--font-mono);
+      font-weight: 700;
       display: flex;
       align-items: center;
       gap: 6px;
@@ -280,51 +298,52 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 7px 15px;
-      border-radius: 10px;
+      padding: 8px 16px;
+      border-radius: 12px;
       font-size: 0.8rem;
-      font-weight: 700;
+      font-weight: 800;
       cursor: pointer;
       border: 1px solid transparent;
       transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
     .btn:hover {
       transform: translateY(-3px) scale(1.04);
-      box-shadow: 0 8px 20px -3px rgba(0, 0, 0, 0.55);
+      box-shadow: 0 8px 22px -3px rgba(136, 19, 55, 0.18);
     }
 
     .btn-audio {
-      background: rgba(255, 241, 242, 0.06);
+      background: rgba(255, 255, 255, 0.88);
       border-color: var(--border-subtle);
       color: var(--text-main);
+      box-shadow: 0 2px 8px rgba(136, 19, 55, 0.05), inset 0 1px 1px #fff;
     }
     .btn-audio:hover {
       border-color: var(--border-focus);
-      color: var(--wine-light);
+      color: var(--wine-primary);
     }
     .btn-audio.active {
-      background: rgba(225, 29, 72, 0.22);
-      border-color: var(--wine-vibrant);
-      color: var(--wine-light);
-      box-shadow: 0 0 15px var(--wine-glow);
+      background: linear-gradient(135deg, #e11d48 0%, #be123c 100%);
+      border-color: var(--wine-primary);
+      color: #ffffff;
+      box-shadow: 0 4px 18px rgba(225, 29, 72, 0.4);
     }
 
     .btn-ack {
-      background: rgba(255, 23, 68, 0.18);
-      border-color: rgba(255, 23, 68, 0.45);
-      color: #fda4af;
+      background: rgba(225, 29, 72, 0.12);
+      border-color: rgba(225, 29, 72, 0.3);
+      color: var(--wine-primary);
     }
     .btn-ack:hover {
-      background: rgba(255, 23, 68, 0.35);
-      border-color: var(--danger);
-      color: #fff;
-      box-shadow: 0 0 20px var(--danger-glow);
+      background: rgba(225, 29, 72, 0.22);
+      border-color: var(--wine-primary);
+      color: #881337;
+      box-shadow: 0 4px 15px rgba(225, 29, 72, 0.25);
     }
     .btn-ack.active-alarm {
-      background: var(--danger);
-      color: #fff;
+      background: linear-gradient(135deg, #ff1744 0%, #be123c 100%);
+      color: #ffffff;
       animation: pulse-ack 1s infinite alternate ease-in-out;
-      box-shadow: 0 0 20px var(--danger-glow);
+      box-shadow: 0 0 22px rgba(225, 29, 72, 0.5);
     }
 
     @keyframes pulse-ack {
@@ -332,12 +351,12 @@
       to { transform: scale(1.05); }
     }
 
-    /* 2. Risk Banner Block */
+    /* 2. Risk Overview Banner Block */
     .risk-banner {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 16px 24px;
+      padding: 18px 26px;
       flex-wrap: wrap;
       gap: 16px;
       animation: floatSlow1 6.5s ease-in-out infinite 0.4s;
@@ -350,27 +369,28 @@
     }
 
     .risk-title {
-      font-size: 0.8rem;
+      font-size: 0.82rem;
       color: var(--text-muted);
-      font-weight: 700;
+      font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.06em;
     }
 
     .risk-bar-container {
-      width: 200px;
-      height: 9px;
-      background: rgba(255, 241, 242, 0.08);
-      border-radius: 6px;
+      width: 210px;
+      height: 10px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 8px;
       overflow: hidden;
-      border: 1px solid rgba(244, 63, 94, 0.22);
+      border: 1px solid rgba(225, 29, 72, 0.22);
+      box-shadow: inset 0 1px 3px rgba(136, 19, 55, 0.08);
     }
 
     .risk-bar-fill {
       height: 100%;
       width: 15%;
-      background: var(--wine-vibrant);
-      border-radius: 6px;
+      background: linear-gradient(90deg, #fda4af 0%, #f43f5e 50%, #881337 100%);
+      border-radius: 8px;
       transition: width 0.4s ease, background-color 0.4s ease;
       box-shadow: 0 0 10px var(--wine-glow);
     }
@@ -378,46 +398,47 @@
     .risk-numeric {
       font-family: var(--font-mono);
       font-weight: 800;
-      font-size: 1.15rem;
-      color: var(--wine-light);
+      font-size: 1.2rem;
+      color: var(--wine-deep);
     }
 
     .severity-pill {
-      font-size: 0.8rem;
+      font-size: 0.82rem;
       font-weight: 800;
       letter-spacing: 0.08em;
-      padding: 7px 18px;
-      border-radius: 10px;
-      border: 1px solid rgba(244, 63, 94, 0.35);
-      background: rgba(225, 29, 72, 0.14);
-      color: var(--wine-light);
+      padding: 8px 20px;
+      border-radius: 12px;
+      border: 1px solid rgba(225, 29, 72, 0.3);
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--wine-primary);
+      box-shadow: 0 2px 8px rgba(136, 19, 55, 0.06);
       transition: all 0.3s ease;
     }
 
     .severity-pill.warning {
-      border-color: rgba(245, 158, 11, 0.45);
-      background: rgba(245, 158, 11, 0.16);
+      border-color: rgba(217, 119, 6, 0.45);
+      background: var(--warning-bg);
       color: var(--warning);
-      box-shadow: 0 0 12px var(--warning-glow);
+      box-shadow: 0 0 15px rgba(217, 119, 6, 0.25);
     }
 
     .severity-pill.critical {
-      border-color: rgba(255, 23, 68, 0.65);
-      background: rgba(255, 23, 68, 0.28);
-      color: #fff;
+      border-color: #ff1744;
+      background: linear-gradient(135deg, #ff1744 0%, #be123c 100%);
+      color: #ffffff;
       animation: alert-flash 1s infinite alternate;
     }
 
     @keyframes alert-flash {
-      from { box-shadow: 0 0 8px var(--danger-glow); }
-      to { box-shadow: 0 0 25px var(--danger-glow); }
+      from { box-shadow: 0 0 8px rgba(225, 29, 72, 0.4); }
+      to { box-shadow: 0 0 26px rgba(225, 29, 72, 0.8); }
     }
 
     /* 3. Vitals Grid Block */
     .vitals-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 18px;
+      gap: 20px;
     }
 
     @media (max-width: 900px) {
@@ -429,14 +450,14 @@
 
     /* Vital Card Blocks */
     .vital-card {
-      padding: 20px 22px;
+      padding: 22px 24px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      min-height: 148px;
+      min-height: 154px;
       position: relative;
       overflow: hidden;
-      border-radius: 16px;
+      border-radius: 18px;
     }
 
     /* Staggered Ambient Floating for Each Vital Card */
@@ -458,7 +479,7 @@
       position: absolute;
       top: 0;
       left: 0;
-      width: 4px;
+      width: 5px;
       height: 100%;
       background: var(--wine-vibrant);
       transition: background-color 0.3s;
@@ -468,31 +489,31 @@
     .vital-card.normal::before { background: var(--wine-vibrant); }
     
     .vital-card.warning {
-      border-color: var(--warning);
-      background: rgba(245, 158, 11, 0.10);
-      box-shadow: 0 0 18px var(--warning-glow);
+      border-color: rgba(217, 119, 6, 0.4);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.94) 0%, rgba(254, 243, 199, 0.7) 100%);
+      box-shadow: 0 0 20px rgba(217, 119, 6, 0.15);
     }
     .vital-card.warning::before { background: var(--warning); }
     .vital-card.warning:hover {
-      border-color: #fbbf24 !important;
-      box-shadow: 0 25px 50px -10px rgba(0, 0, 0, 0.88), 0 0 35px var(--warning-glow) !important;
+      border-color: var(--warning) !important;
+      box-shadow: 0 26px 52px -10px rgba(217, 119, 6, 0.25) !important;
     }
 
     .vital-card.critical {
-      border-color: var(--danger);
-      background: rgba(255, 23, 68, 0.16);
-      box-shadow: 0 0 28px var(--danger-glow);
+      border-color: rgba(225, 29, 72, 0.6);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 228, 230, 0.8) 100%);
+      box-shadow: 0 0 28px rgba(225, 29, 72, 0.22);
       animation: card-pulsing 1.2s infinite alternate ease-in-out;
     }
-    .vital-card.critical::before { background: var(--danger); }
+    .vital-card.critical::before { background: var(--wine-vibrant); }
     .vital-card.critical:hover {
-      border-color: #ff5252 !important;
-      box-shadow: 0 25px 50px -10px rgba(0, 0, 0, 0.88), 0 0 45px var(--danger-glow) !important;
+      border-color: #ff1744 !important;
+      box-shadow: 0 26px 52px -10px rgba(225, 29, 72, 0.4) !important;
     }
 
     @keyframes card-pulsing {
-      0% { border-color: rgba(255, 23, 68, 0.45); }
-      100% { border-color: rgba(255, 23, 68, 1); box-shadow: 0 0 35px var(--danger-glow); }
+      0% { border-color: rgba(225, 29, 72, 0.4); }
+      100% { border-color: rgba(225, 29, 72, 1); box-shadow: 0 0 35px rgba(225, 29, 72, 0.35); }
     }
 
     .vital-header {
@@ -502,58 +523,61 @@
     }
 
     .vital-name {
-      font-size: 0.8rem;
-      font-weight: 700;
+      font-size: 0.82rem;
+      font-weight: 800;
       color: var(--text-muted);
       text-transform: uppercase;
       letter-spacing: 0.06em;
     }
 
     .vital-icon {
-      font-size: 1.25rem;
-      background: rgba(225, 29, 72, 0.15);
-      padding: 6px;
-      border-radius: 8px;
+      font-size: 1.3rem;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(254, 226, 232, 0.85));
+      border: 1px solid rgba(225, 29, 72, 0.15);
+      padding: 6px 8px;
+      border-radius: 10px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      box-shadow: 0 3px 10px rgba(136, 19, 55, 0.06);
     }
 
     .vital-body {
-      margin: 12px 0;
+      margin: 14px 0;
     }
 
     .vital-value {
       font-family: var(--font-mono);
-      font-size: 2.3rem;
+      font-size: 2.45rem;
       font-weight: 800;
       line-height: 1;
       letter-spacing: -0.03em;
-      color: #fff1f2;
-      text-shadow: 0 0 15px rgba(244, 63, 94, 0.3);
+      color: var(--text-main);
+      text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
     }
 
     .vital-unit {
-      font-size: 0.85rem;
+      font-size: 0.88rem;
       color: var(--text-muted);
-      margin-left: 5px;
+      margin-left: 6px;
       font-family: var(--font-sans);
-      font-weight: 600;
+      font-weight: 700;
     }
 
     .vital-footer {
-      font-size: 0.74rem;
-      color: var(--text-muted);
+      font-size: 0.76rem;
+      color: var(--text-secondary);
       display: flex;
       justify-content: space-between;
       font-family: var(--font-mono);
+      font-weight: 700;
     }
 
     /* 4. Chart & Alerts Content Split */
     .content-split {
       display: grid;
       grid-template-columns: 2fr 1fr;
-      gap: 18px;
+      gap: 20px;
     }
 
     @media (max-width: 950px) {
@@ -562,10 +586,10 @@
 
     /* Chart Section Block */
     .chart-panel {
-      padding: 20px 24px;
+      padding: 22px 26px;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 16px;
       animation: floatSlow3 7.2s ease-in-out infinite 0.5s;
     }
 
@@ -576,27 +600,28 @@
     }
 
     .chart-title {
-      font-size: 1rem;
-      font-weight: 700;
-      color: #fff1f2;
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--text-main);
     }
 
     .chart-legend {
       display: flex;
       gap: 16px;
-      font-size: 0.75rem;
+      font-size: 0.78rem;
       font-family: var(--font-mono);
+      font-weight: 700;
     }
 
     .legend-item {
       display: flex;
       align-items: center;
       gap: 6px;
-      color: var(--text-muted);
+      color: var(--text-secondary);
     }
 
     .dot-hr { width: 10px; height: 10px; border-radius: 2px; background: var(--wine-vibrant); box-shadow: 0 0 6px var(--wine-glow); }
-    .dot-spo2 { width: 10px; height: 10px; border-radius: 2px; background: var(--wine-light); box-shadow: 0 0 6px rgba(253, 164, 175, 0.4); }
+    .dot-spo2 { width: 10px; height: 10px; border-radius: 2px; background: var(--wine-deep); box-shadow: 0 0 6px rgba(136, 19, 55, 0.3); }
 
     .chart-wrapper {
       position: relative;
@@ -606,10 +631,10 @@
 
     /* Alerts Log Section Block */
     .alerts-panel {
-      padding: 20px 24px;
+      padding: 22px 26px;
       display: flex;
       flex-direction: column;
-      height: 360px;
+      height: 370px;
       animation: floatSlow1 6.8s ease-in-out infinite 1.1s;
     }
 
@@ -621,34 +646,35 @@
     }
 
     .alerts-title {
-      font-size: 1rem;
-      font-weight: 700;
+      font-size: 1.05rem;
+      font-weight: 800;
       display: flex;
       align-items: center;
       gap: 8px;
-      color: #fff1f2;
+      color: var(--text-main);
     }
 
     .alerts-count {
-      background: rgba(225, 29, 72, 0.25);
-      color: var(--wine-light);
-      border: 1px solid rgba(244, 63, 94, 0.3);
-      font-size: 0.75rem;
-      padding: 2px 9px;
+      background: rgba(225, 29, 72, 0.15);
+      color: var(--wine-primary);
+      border: 1px solid rgba(225, 29, 72, 0.25);
+      font-size: 0.76rem;
+      padding: 2px 10px;
       border-radius: 12px;
       font-family: var(--font-mono);
-      font-weight: 700;
+      font-weight: 800;
     }
 
     .btn-clear {
       background: transparent;
       border: none;
       color: var(--text-muted);
-      font-size: 0.75rem;
+      font-size: 0.78rem;
+      font-weight: 700;
       cursor: pointer;
       transition: color 0.2s ease;
     }
-    .btn-clear:hover { color: #fff1f2; }
+    .btn-clear:hover { color: var(--text-main); }
 
     .alerts-scroll {
       flex: 1;
@@ -663,18 +689,20 @@
       width: 5px;
     }
     .alerts-scroll::-webkit-scrollbar-thumb {
-      background: rgba(244, 63, 94, 0.2);
+      background: rgba(225, 29, 72, 0.2);
       border-radius: 4px;
     }
 
     .alert-entry {
-      padding: 11px 14px;
-      border-radius: 10px;
+      padding: 12px 15px;
+      border-radius: 12px;
       font-size: 0.78rem;
       font-family: var(--font-mono);
       line-height: 1.4;
-      background: rgba(35, 8, 18, 0.55);
-      border-left: 3px solid var(--border-subtle);
+      background: rgba(255, 255, 255, 0.85);
+      border: 1px solid rgba(225, 29, 72, 0.12);
+      border-left: 4px solid var(--border-subtle);
+      box-shadow: 0 2px 6px rgba(136, 19, 55, 0.04);
       display: flex;
       flex-direction: column;
       gap: 4px;
@@ -683,8 +711,8 @@
     }
     .alert-entry:hover {
       transform: translateX(4px) translateY(-2px);
-      background: rgba(55, 12, 28, 0.85);
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+      background: rgba(255, 255, 255, 0.98);
+      box-shadow: 0 6px 18px rgba(136, 19, 55, 0.1);
     }
 
     @keyframes entry-fade {
@@ -693,26 +721,27 @@
     }
 
     .alert-entry.critical {
-      border-left-color: var(--danger);
-      background: rgba(255, 23, 68, 0.12);
-      color: #ffe4e6;
+      border-left-color: var(--wine-vibrant);
+      background: rgba(255, 228, 230, 0.88);
+      color: #881337;
     }
 
     .alert-entry.warning {
       border-left-color: var(--warning);
-      background: rgba(245, 158, 11, 0.12);
-      color: #fef3c7;
+      background: rgba(254, 243, 199, 0.85);
+      color: #78350f;
     }
 
     .alert-entry.info {
-      border-left-color: var(--wine-vibrant);
-      color: #fecdd3;
+      border-left-color: var(--wine-primary);
+      color: #700c27;
     }
 
     .entry-meta {
       display: flex;
       justify-content: space-between;
-      font-size: 0.7rem;
+      font-size: 0.72rem;
+      font-weight: 800;
       opacity: 0.85;
     }
   </style>
@@ -726,7 +755,7 @@
         <div class="pulse-ring" id="liveRing"></div>
         <div>
           <h1 class="brand-title">ICU Real-Time Telemetry & Anomaly Detector</h1>
-          <p class="brand-subtitle">Wine Red Telemetry Engine • IsolationForest ML + Rule Guardrails</p>
+          <p class="brand-subtitle">Wine Red & Frosted White Blended Stream • IsolationForest ML + Guardrails</p>
         </div>
       </div>
 
@@ -761,7 +790,7 @@
         <!-- System Status -->
         <div class="system-status">
           <span>Engine:</span>
-          <strong style="color: var(--wine-light);">Online (1 Hz)</strong>
+          <strong style="color: var(--wine-primary);">Online (1 Hz)</strong>
         </div>
       </div>
     </header>
@@ -777,7 +806,7 @@
       </div>
 
       <div style="display: flex; align-items: center; gap: 12px;">
-        <span style="font-size: 0.8rem; color: var(--text-muted);">Current Severity:</span>
+        <span style="font-size: 0.82rem; color: var(--text-muted); font-weight: 700;">Current Severity:</span>
         <div class="severity-pill" id="severityPill">NORMAL</div>
       </div>
     </section>
@@ -943,27 +972,27 @@
           {
             label: "Heart Rate (bpm)",
             data: hrData,
-            borderColor: "#f43f5e",
-            backgroundColor: "rgba(244, 63, 94, 0.12)",
-            borderWidth: 2.2,
+            borderColor: "#e11d48",
+            backgroundColor: "rgba(225, 29, 72, 0.08)",
+            borderWidth: 2.4,
             tension: 0.35,
             fill: true,
             yAxisID: "yHR",
-            pointRadius: 2.5,
-            pointBackgroundColor: "#f43f5e",
+            pointRadius: 2.8,
+            pointBackgroundColor: "#e11d48",
             pointHoverRadius: 6,
           },
           {
             label: "SpO2 (%)",
             data: spo2Data,
-            borderColor: "#fda4af",
+            borderColor: "#881337",
             backgroundColor: "transparent",
             borderWidth: 2.2,
             tension: 0.3,
             borderDash: [4, 4],
             yAxisID: "ySpO2",
-            pointRadius: 2.5,
-            pointBackgroundColor: "#fda4af",
+            pointRadius: 2.8,
+            pointBackgroundColor: "#881337",
             pointHoverRadius: 6,
           }
         ]
@@ -976,19 +1005,22 @@
         plugins: {
           legend: { display: false },
           tooltip: {
-            backgroundColor: "rgba(28, 6, 15, 0.95)",
-            borderColor: "rgba(244, 63, 94, 0.40)",
+            backgroundColor: "rgba(255, 255, 255, 0.96)",
+            titleColor: "#4c0519",
+            bodyColor: "#881337",
+            borderColor: "rgba(225, 29, 72, 0.3)",
             borderWidth: 1,
-            titleFont: { family: "'JetBrains Mono', monospace", size: 11 },
+            titleFont: { family: "'JetBrains Mono', monospace", size: 11, weight: '700' },
             bodyFont: { family: "'JetBrains Mono', monospace", size: 12 },
+            boxShadow: "0 6px 20px rgba(136, 19, 55, 0.15)",
           }
         },
         scales: {
           x: {
-            grid: { color: "rgba(244, 63, 94, 0.08)" },
+            grid: { color: "rgba(136, 19, 55, 0.06)" },
             ticks: {
-              color: "#fda4af",
-              font: { family: "'JetBrains Mono', monospace", size: 10 },
+              color: "#9f1239",
+              font: { family: "'JetBrains Mono', monospace", size: 10, weight: '600' },
               maxRotation: 0,
             }
           },
@@ -997,10 +1029,10 @@
             position: "left",
             min: 40,
             max: 180,
-            grid: { color: "rgba(244, 63, 94, 0.08)" },
+            grid: { color: "rgba(136, 19, 55, 0.06)" },
             ticks: {
-              color: "#f43f5e",
-              font: { family: "'JetBrains Mono', monospace", size: 11 },
+              color: "#e11d48",
+              font: { family: "'JetBrains Mono', monospace", size: 11, weight: '700' },
               callback: (v) => `${v} bpm`
             }
           },
@@ -1011,8 +1043,8 @@
             max: 100,
             grid: { drawOnChartArea: false },
             ticks: {
-              color: "#fda4af",
-              font: { family: "'JetBrains Mono', monospace", size: 11 },
+              color: "#881337",
+              font: { family: "'JetBrains Mono', monospace", size: 11, weight: '700' },
               callback: (v) => `${v}%`
             }
           }
@@ -1162,14 +1194,14 @@
       severityPill.className = "severity-pill";
       if (severity === "CRITICAL") {
         severityPill.classList.add("critical");
-        riskFill.style.backgroundColor = "#ff1744";
+        riskFill.style.background = "linear-gradient(90deg, #ff1744 0%, #be123c 100%)";
         ackBtn.classList.add("active-alarm");
         playMedicalBeep();
       } else if (severity === "WARNING") {
         severityPill.classList.add("warning");
-        riskFill.style.backgroundColor = "#f59e0b";
+        riskFill.style.background = "linear-gradient(90deg, #fbbf24 0%, #d97706 100%)";
       } else {
-        riskFill.style.backgroundColor = "#f43f5e";
+        riskFill.style.background = "linear-gradient(90deg, #fda4af 0%, #f43f5e 50%, #881337 100%)";
         isAlarmSilenced = false; // Reset acknowledgment when healthy
         ackBtn.classList.remove("active-alarm");
       }

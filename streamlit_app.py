@@ -22,49 +22,51 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# Custom Medical CSS Theme (Wine Red Palette)
+# Custom Medical CSS Theme (Blended Frosted White & Wine Red)
 st.markdown(
     """
     <style>
     .main { 
-        background: radial-gradient(ellipse at 10% 10%, rgba(225, 29, 72, 0.14) 0px, transparent 50%),
-                    radial-gradient(ellipse at 90% 90%, rgba(136, 19, 55, 0.18) 0px, transparent 55%),
-                    #0b0204; 
-        color: #fff1f2; 
+        background: radial-gradient(ellipse at 12% 12%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 241, 243, 0.8) 35%, transparent 65%),
+                    radial-gradient(ellipse at 88% 12%, rgba(225, 29, 72, 0.16) 0%, rgba(254, 205, 211, 0.35) 40%, transparent 65%),
+                    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.9) 0%, rgba(255, 228, 235, 0.45) 45%, transparent 70%),
+                    #fcf6f8; 
+        color: #4c0519; 
     }
     .stMetric {
-        background: rgba(28, 6, 15, 0.75);
-        border: 1px solid rgba(244, 63, 94, 0.22);
-        border-radius: 14px;
-        padding: 16px 20px;
-        box-shadow: 0 10px 30px -5px rgba(0,0,0,0.65), 0 0 16px rgba(136, 19, 55, 0.15);
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.92) 0%, rgba(255, 248, 250, 0.85) 50%, rgba(254, 226, 232, 0.8) 100%);
+        border: 1px solid rgba(255, 255, 255, 0.95);
+        border-bottom: 1px solid rgba(225, 29, 72, 0.22);
+        border-radius: 16px;
+        padding: 18px 22px;
+        box-shadow: 0 10px 30px -5px rgba(136, 19, 55, 0.08), 0 3px 14px rgba(255, 255, 255, 0.9), inset 0 1px 2px #fff;
         transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
     .stMetric:hover {
         transform: translateY(-6px) scale(1.02);
-        border-color: rgba(251, 113, 133, 0.65);
-        box-shadow: 0 20px 40px -8px rgba(0,0,0,0.8), 0 0 25px rgba(225, 29, 72, 0.4);
+        border-color: rgba(225, 29, 72, 0.45);
+        box-shadow: 0 20px 42px -8px rgba(136, 19, 55, 0.16), 0 0 25px rgba(255, 255, 255, 0.95), 0 0 18px rgba(225, 29, 72, 0.25);
     }
     .metric-card-critical {
-        background: rgba(255, 23, 68, 0.16) !important;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 228, 230, 0.85) 100%) !important;
         border: 1px solid #ff1744 !important;
-        box-shadow: 0 0 25px rgba(255, 23, 68, 0.5) !important;
+        box-shadow: 0 0 25px rgba(225, 29, 72, 0.3) !important;
     }
     .metric-card-warning {
-        background: rgba(245, 158, 11, 0.16) !important;
-        border: 1px solid #f59e0b !important;
-        box-shadow: 0 0 20px rgba(245, 158, 11, 0.35) !important;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.94) 0%, rgba(254, 243, 199, 0.75) 100%) !important;
+        border: 1px solid #d97706 !important;
+        box-shadow: 0 0 20px rgba(217, 119, 6, 0.2) !important;
     }
     .status-pill {
         display: inline-block;
         padding: 6px 16px;
         border-radius: 20px;
-        font-weight: 700;
+        font-weight: 800;
         font-size: 0.85rem;
     }
-    .status-normal { background: rgba(225, 29, 72, 0.15); color: #fda4af; border: 1px solid rgba(244, 63, 94, 0.4); }
-    .status-warning { background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid #f59e0b; }
-    .status-critical { background: rgba(255, 23, 68, 0.28); color: #fff; border: 1px solid #ff1744; }
+    .status-normal { background: rgba(255, 255, 255, 0.9); color: #be123c; border: 1px solid rgba(225, 29, 72, 0.3); }
+    .status-warning { background: rgba(254, 243, 199, 0.85); color: #b45309; border: 1px solid #d97706; }
+    .status-critical { background: linear-gradient(135deg, #ff1744 0%, #be123c 100%); color: #fff; border: 1px solid #ff1744; }
     </style>
     """,
     unsafe_allow_html=True,
